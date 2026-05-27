@@ -99,7 +99,7 @@ pipeline {
                 )]) {
 
                     sh """
-                        ./mvn clean deploy -DskipTests \
+                        mvn clean deploy -DskipTests \
                         -Drevision=${env.VERSION} \
                         -DaltDeploymentRepository=nexus::default::${NEXUS_RELEASE_URL} \
                         --settings /var/jenkins_home/.m2/settings.xml
