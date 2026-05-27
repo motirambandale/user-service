@@ -166,7 +166,7 @@ pipeline {
                 ]) {
 
                     sh '''
-                        echo $NEXUS_PASS | docker login host.docker.internal:8082 \
+                        echo $NEXUS_PASS | docker login ${NEXUS_DOCKER_URL} \
                         -u $NEXUS_USER \
                         --password-stdin
                     '''
@@ -199,7 +199,8 @@ pipeline {
 
         success {
 
-            echo "Pipeline Completed Successfully"
+            echo "🚀 Pipeline Completed Successfully with Version: ${env.VERSION}"
+            echo "🐳 Docker Image Pushed Successfully to Nexus"
         }
 
         failure {
