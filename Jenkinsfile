@@ -9,29 +9,26 @@ pipeline {
 
     environment {
         IMAGE_NAME = "user-service"
+        
+              // SonarQube
+        SONARQUBE_ENV = "SonarQubeServer"
     }
 
     stages {
 
         stage('Source Code Checkout from GitHub') {
-
             steps {
                 checkout scm
             }
         }
 
         stage('Extract Version from Git Tag') {
-
             steps {
-
                 script {
-
-               
-                    
                     env.VERSION = sh(
-    script: "git describe --tags --abbrev=0 2>/dev/null || echo v0.0.${BUILD_NUMBER}",
-    returnStdout: true
-).trim()
+                        script: "git describe --tags --abbrev=0 2>/dev/null || echo v0.0.${BUILD_NUMBER}",
+                        returnStdout: true
+                    ).trim()
 
                     env.IMAGE_TAG = env.VERSION
 
@@ -41,35 +38,29 @@ pipeline {
         }
 
         stage('Pipeline Initialization') {
-
             steps {
-
                 echo "Pipeline Started Successfully"
                 echo "Application Version: ${env.VERSION}"
             }
         }
 
-        stage('Maven Compile - Build Application') {
-
+        stage('Maven Build') {
             steps {
-
-                sh 'mvn clean compile'
-                
+                sh "mvn clean compile"
             }
         }
-        
-          stage('Run JUnit Test Cases') {
+
+        stage('Run JUnit Test Cases') {
             steps {
-                   sh "mvn clean test -Drevision=${env.VERSION}"
+                sh "mvn test -Drevision=${env.VERSION}"
             }
         }
-    }
-    
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
                     sh """
-                        mvn sonar:sonar \
+                         mvn sonar:sonar \
                         -Drevision=${env.VERSION} \
                         -Dsonar.projectKey=user-service \
                         -Dsonar.projectName=user-service
@@ -77,21 +68,18 @@ pipeline {
                 }
             }
         }
+    }
 
     post {
-
         success {
-
             echo "Pipeline Completed Successfully"
         }
 
         failure {
-
             echo "Pipeline Execution Failed"
         }
 
         always {
-
             cleanWs()
         }
     }
