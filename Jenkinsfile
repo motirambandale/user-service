@@ -12,6 +12,13 @@ pipeline {
         
               // SonarQube
         SONARQUBE_ENV = "SonarQubeServer"
+        
+            // Nexus (Maven repo)
+        NEXUS_RELEASE_URL = "http://host.docker.internal:8081/repository/maven-releases/"
+
+        // Nexus Docker Registry
+        NEXUS_DOCKER_URL = "host.docker.internal:8081"
+        NEXUS_DOCKER_REPO = "docker-releases"
     }
 
     stages {
@@ -80,6 +87,24 @@ pipeline {
           stage('Build & Package Artifact') {
             steps {
                 sh "mvn clean package -DskipTests -Drevision=${env.VERSION}"
+            }
+        }
+        
+           stage('Deploy Artifact to Nexus (Maven)') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-creds',
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+
+                    sh """
+                        ./mvn clean deploy -DskipTests \
+                        -Drevision=${env.VERSION} \
+                        -DaltDeploymentRepository=nexus::default::${NEXUS_RELEASE_URL} \
+                        --settings /var/jenkins_home/.m2/settings.xml
+                    """
+                }
             }
         }
     }
