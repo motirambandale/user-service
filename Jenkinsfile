@@ -120,7 +120,7 @@ pipeline {
             }
         }
 
-        stage('Login to Nexus Docker Registry') {
+    /*        stage('Login to Nexus Docker Registry') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'nexus-creds',
@@ -134,7 +134,17 @@ pipeline {
                     """
                 }
             }
+        }*/
+        
+  stage('Docker Login to Nexus') {
+    steps {
+        withCredentials([string(credentialsId: 'nexus-pass', variable: 'NEXUS_PASS')]) {
+            sh '''
+                echo $NEXUS_PASS | docker login localhost:8082 -u admin --password-stdin
+            '''
         }
+    }
+}
 
         stage('Push Docker Image to Nexus') {
             steps {
