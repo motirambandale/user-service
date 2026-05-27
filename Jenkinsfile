@@ -58,16 +58,9 @@ pipeline {
         
           stage('Run JUnit Test Cases') {
             steps {
-                sh "./mvn test -Drevision=${env.VERSION}"
-            }
-            post {
-                always {
-                    junit '**/target/surefire-reports/*.xml'
-                }
+                sh 'mvn clean test -Drevision=${env.VERSION}'
             }
         }
-        
-        
     }
 
     post {
