@@ -51,9 +51,8 @@ pipeline {
 
             steps {
 
-                sh '''
-                    mvn clean compile
-                '''
+                sh 'mvn clean compile'
+                
             }
         }
     }
