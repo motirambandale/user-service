@@ -26,10 +26,12 @@ pipeline {
 
                 script {
 
+               
+                    
                     env.VERSION = sh(
-                        script: "git describe --tags --abbrev=0 || echo v0.0.${BUILD_NUMBER}",
-                        returnStdout: true
-                    ).trim()
+    script: "git describe --tags --abbrev=0 2>/dev/null || echo v0.0.${BUILD_NUMBER}",
+    returnStdout: true
+).trim()
 
                     env.IMAGE_TAG = env.VERSION
 
@@ -58,7 +60,7 @@ pipeline {
         
           stage('Run JUnit Test Cases') {
             steps {
-                   sh 'mvn clean test -Drevision=v0.0.11'
+                   sh "mvn clean test -Drevision=${env.VERSION}"
             }
         }
     }
