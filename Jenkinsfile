@@ -76,6 +76,12 @@ pipeline {
                 }
             }
         }
+        
+          stage('Build & Package Artifact') {
+            steps {
+                sh "mvn clean package -DskipTests -Drevision=${env.VERSION}"
+            }
+        }
     }
 
     post {
