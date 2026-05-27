@@ -58,7 +58,7 @@ pipeline {
         
           stage('Run JUnit Test Cases') {
             steps {
-                   sh 'mvn clean test -Drevision=v0.0.9'
+                   sh 'mvn clean test -Drevision=${env.VERSION}'
             }
         }
     }
