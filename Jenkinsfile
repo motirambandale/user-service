@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Maven Clean Compile') {
+        stage('Maven Compile - Build Application') {
 
             steps {
 
@@ -55,6 +55,19 @@ pipeline {
                 
             }
         }
+        
+          stage('Run JUnit Test Cases') {
+            steps {
+                sh "./mvn test -Drevision=${env.VERSION}"
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+        
+        
     }
 
     post {
