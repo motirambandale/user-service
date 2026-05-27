@@ -107,6 +107,48 @@ pipeline {
                 }
             }
         }
+        
+         stage('Build Docker Image') {
+            steps {
+                script {
+                    env.DOCKER_IMAGE = "${IMAGE_NAME}:${env.VERSION}"
+
+                    sh """
+                        docker build -t ${env.DOCKER_IMAGE} .
+                    """
+                }
+            }
+        }
+
+        stage('Login to Nexus Docker Registry') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-creds',
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+
+                    sh """
+                        echo $NEXUS_PASS | docker login ${NEXUS_DOCKER_URL} \
+                        -u $NEXUS_USER --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image to Nexus') {
+            steps {
+                script {
+                    env.FULL_IMAGE =
+                        "${NEXUS_DOCKER_URL}/${NEXUS_DOCKER_REPO}/${IMAGE_NAME}:${env.VERSION}"
+
+                    sh """
+                        docker tag ${env.DOCKER_IMAGE} ${env.FULL_IMAGE}
+                        docker push ${env.FULL_IMAGE}
+                    """
+                }
+            }
+        }
     }
 
     post {
