@@ -64,6 +64,19 @@ pipeline {
             }
         }
     }
+    
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh """
+                        mvn sonar:sonar \
+                        -Drevision=${env.VERSION} \
+                        -Dsonar.projectKey=user-service \
+                        -Dsonar.projectName=user-service
+                    """
+                }
+            }
+        }
 
     post {
 
